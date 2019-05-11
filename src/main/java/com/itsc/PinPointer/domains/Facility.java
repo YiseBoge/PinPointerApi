@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @FirebaseDocument("/facility")
 public class Facility {
 
-    public Facility(String name, String description, String type, long latitude, long longitude, int views) {
+    public Facility(String name, String description, String type, double latitude, double longitude, int views) {
         this.name = name;
         this.description = description;
         this.type = type;
@@ -29,8 +29,8 @@ public class Facility {
 
     private String type;
 
-    private long latitude;
-    private long longitude;
+    private double latitude;
+    private double longitude;
 
     private int views = 0;
 

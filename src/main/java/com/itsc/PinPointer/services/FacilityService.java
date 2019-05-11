@@ -2,17 +2,28 @@ package com.itsc.PinPointer.services;
 
 import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.json.JsonFacility;
+import com.itsc.PinPointer.domains.json.QuerryObject;
 import com.itsc.PinPointer.exceptions.DataNotFoundException;
 import com.itsc.PinPointer.repositories.FacilityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
 public class FacilityService {
 
+    //Name Sorter
+    Comparator<JsonFacility> compareByName = Comparator.comparing(JsonFacility::getName);
+    //Type Sorter
+    Comparator<JsonFacility> compareByType = Comparator.comparing(JsonFacility::getType);
+    //Views Sorter
+    Comparator<JsonFacility> compareByViews = Comparator.comparingInt(JsonFacility::getViews);
+    //Votes Sorter
+    Comparator<JsonFacility> compareByVotes = Comparator.comparingInt(JsonFacility::getVotes);
     private FacilityRepository facilityRepository;
     private UserService userService;
 
@@ -22,13 +33,17 @@ public class FacilityService {
         this.userService = userService;
     }
 
-    public Facility save(Facility facility){
+    public Facility save(Facility facility) {
         return facilityRepository.push(facility);
     }
 
-    public List<JsonFacility> findAll(){
+    public Facility update(Facility facility) {
+        return facilityRepository.update(facility);
+    }
+
+    public List<JsonFacility> findAll() {
         List<Facility> facilities = facilityRepository.findAll();
-        List<JsonFacility> jsonFacilities = new ArrayList<>();
+        ArrayList<JsonFacility> jsonFacilities = new ArrayList<>();
 
         for (Facility facility :
                 facilities) {
@@ -36,20 +51,30 @@ public class FacilityService {
                     toJsonFacility(facility)
             );
         }
+
+//        jsonFacilities = sort(jsonFacilities, "name");
+        QuerryObject querryObject = new QuerryObject();
+
+        jsonFacilities = filter(jsonFacilities, querryObject);
+
+        jsonFacilities = sort(jsonFacilities, "name");
+
         return jsonFacilities;
     }
 
     public Facility findById(String facilityId) throws DataNotFoundException {
-        Facility found = facilityRepository.get(facilityId);
+        Facility found;
 
-        if (found == null){
+        try {
+            found = facilityRepository.get(facilityId);
+        } catch (Exception e) {
             throw new DataNotFoundException("No Facility of that Id was Found.");
         }
 
         return found;
     }
 
-    public JsonFacility toJsonFacility(Facility facility){
+    public JsonFacility toJsonFacility(Facility facility) {
         return new JsonFacility(
                 facility.getId(),
                 facility.getName(),
@@ -63,10 +88,74 @@ public class FacilityService {
         );
     }
 
-
     public Facility view(Facility facility) {
-
         facility.incrementViews();
         return facilityRepository.update(facility);
+    }
+
+    public double distance(Facility facility, double latit, double longit) {
+        return distance(facility.getLatitude(), facility.getLongitude(), latit, longit);
+    }
+
+    public double distance(double lat1, double long1, double lat2, double long2) {
+        return convertDegreeToMeter(Math.sqrt(
+                Math.pow((lat1 - lat2), 2) +
+                        Math.pow((long1 - long2), 2)
+        ));
+    }
+
+    public double convertDegreeToMeter(double degree){
+        return degree * 111139;
+    }
+
+    public void delete(String facilityId) {
+        facilityRepository.remove(facilityId);
+    }
+
+    public ArrayList<JsonFacility> filter(ArrayList<JsonFacility> allFacilities, QuerryObject parameters) {
+        ArrayList<JsonFacility> filtered = new ArrayList<>();
+
+        for (JsonFacility facility :
+                allFacilities) {
+            if (parameters.getName() == null || facility.getName().contains(parameters.getName())) {
+                if (parameters.getDescription() == null || facility.getDescription().contains(parameters.getDescription())) {
+                    if (parameters.getType() == null || facility.getType().contains(parameters.getType())) {
+                        if (parameters.getMinViews() == 0 || (facility.getViews() >= parameters.getMinViews())) {
+                            if (parameters.getMinVotes() == 0 || (facility.getVotes() >= parameters.getMinVotes())) {
+                                if (parameters.getMaxDistance() == 0 ||
+                                        (distance(facility.getLatitude(), facility.getLongitude(),
+                                                parameters.getLatitude(), parameters.getLongitude())
+                                                <= parameters.getMaxDistance())) {
+
+                                    filtered.add(facility);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return filtered;
+    }
+
+    public ArrayList<JsonFacility> sort(ArrayList<JsonFacility> facilities, String parameter) {
+        switch (parameter) {
+            case "name":
+                Collections.sort(facilities, compareByName);
+                break;
+            case "type":
+                Collections.sort(facilities, compareByType);
+                break;
+            case "views":
+                Collections.sort(facilities, compareByViews);
+                break;
+            case "votes":
+                Collections.sort(facilities, compareByVotes);
+                break;
+        }
+
+
+        return facilities;
     }
 }

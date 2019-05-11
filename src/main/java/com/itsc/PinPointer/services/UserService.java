@@ -1,10 +1,13 @@
 package com.itsc.PinPointer.services;
 
+import com.github.fabiomaffioletti.firebase.repository.Filter;
 import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.FacilityVote;
 import com.itsc.PinPointer.repositories.FacilityVoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UserService {
@@ -17,7 +20,17 @@ public class UserService {
     }
 
     public FacilityVote vote(FacilityVote facilityVote){
-        return facilityVoteRepository.push(facilityVote);
+
+        Filter.FilterBuilder filter = Filter.FilterBuilder.builder();
+        filter.orderBy("phoneNumber");
+        filter.equalTo(facilityVote.getPhoneNumber());
+
+        List<FacilityVote> facilityVotes = facilityVoteRepository.find(filter.build());
+
+        if (facilityVotes.isEmpty()){
+            return facilityVoteRepository.push(facilityVote);
+        }
+        return facilityVote;
     }
 
     public int getVotes(Facility facility){

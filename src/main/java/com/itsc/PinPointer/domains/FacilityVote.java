@@ -15,6 +15,11 @@ public class FacilityVote {
     @FirebaseId
     private String id;
 
+    public FacilityVote(String facilityId, String phoneNumber) {
+        this.facilityId = facilityId;
+        this.phoneNumber = phoneNumber;
+    }
+
     private String facilityId;
 
     private String phoneNumber;
