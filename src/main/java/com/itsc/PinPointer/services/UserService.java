@@ -20,11 +20,6 @@ public class UserService {
         return facilityVoteRepository.push(facilityVote);
     }
 
-    public int getViews(Facility facility){
-        //TODO get the number of Views for the facility
-        return 0;
-    }
-
     public int getVotes(Facility facility){
         //TODO get the number of votes for the facility
         return 0;

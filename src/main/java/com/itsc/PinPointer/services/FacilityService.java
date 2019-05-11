@@ -64,8 +64,7 @@ public class FacilityService {
     }
 
 
-    public Facility view(String facilityId) throws DataNotFoundException {
-        Facility facility = findById(facilityId);
+    public Facility view(Facility facility) {
 
         facility.incrementViews();
         return facilityRepository.update(facility);

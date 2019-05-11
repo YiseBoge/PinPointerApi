@@ -37,8 +37,9 @@ public class FacilityController {
     @GetMapping("/{id}")
     public ResponseEntity<JsonFacility> findOne(@PathVariable("id") String facilityId) throws DataNotFoundException {
         Facility found = facilityService.findById(facilityId);
-        JsonFacility jsonFacility = facilityService.toJsonFacility(found);
+        facilityService.view(found);
 
+        JsonFacility jsonFacility = facilityService.toJsonFacility(found);
         return new ResponseEntity<>(jsonFacility, HttpStatus.OK);
     }
 
