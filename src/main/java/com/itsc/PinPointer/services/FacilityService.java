@@ -57,9 +57,17 @@ public class FacilityService {
                 facility.getType(),
                 facility.getLatitude(),
                 facility.getLongitude(),
+                facility.getViews(),
 
-                userService.getViews(facility),
                 userService.getVotes(facility)
         );
-    };
+    }
+
+
+    public Facility view(String facilityId) throws DataNotFoundException {
+        Facility facility = findById(facilityId);
+
+        facility.incrementViews();
+        return facilityRepository.update(facility);
+    }
 }

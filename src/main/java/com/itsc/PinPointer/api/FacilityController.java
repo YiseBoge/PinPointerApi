@@ -50,7 +50,8 @@ public class FacilityController {
                 jsonFacility.getDescription(),
                 jsonFacility.getType(),
                 jsonFacility.getLatitude(),
-                jsonFacility.getLongitude()
+                jsonFacility.getLongitude(),
+                0
         ));
 
         return new ResponseEntity<>(saved, HttpStatus.CREATED);
