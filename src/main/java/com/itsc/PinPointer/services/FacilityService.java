@@ -139,6 +139,22 @@ public class FacilityService {
         return filtered;
     }
 
+    public ArrayList<JsonFacility> filter(ArrayList<JsonFacility> allFacilities, String parameter) {
+        ArrayList<JsonFacility> filtered = new ArrayList<>();
+
+        for (JsonFacility facility :
+                allFacilities) {
+
+            if (facility.getName().contains(parameter)
+                    || facility.getDescription().contains(parameter)
+                    || facility.getType().contains(parameter)){
+                filtered.add(facility);
+            }
+        }
+
+        return filtered;
+    }
+
     public ArrayList<JsonFacility> sort(ArrayList<JsonFacility> facilities, String parameter) {
         switch (parameter) {
             case "name":

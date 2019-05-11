@@ -7,6 +7,7 @@ import com.itsc.PinPointer.repositories.FacilityVoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,12 +21,9 @@ public class UserService {
     }
 
     public FacilityVote vote(FacilityVote facilityVote){
+        List<FacilityVote> facilityVotes = facilityVoteRepository.findAll();
 
-        Filter.FilterBuilder filter = Filter.FilterBuilder.builder();
-        filter.orderBy("phoneNumber");
-        filter.equalTo(facilityVote.getPhoneNumber());
-
-        List<FacilityVote> facilityVotes = facilityVoteRepository.find(filter.build());
+        facilityVotes = filterByPhoneNumber(facilityVotes, facilityVote.getPhoneNumber());
 
         if (facilityVotes.isEmpty()){
             return facilityVoteRepository.push(facilityVote);
@@ -34,7 +32,34 @@ public class UserService {
     }
 
     public int getVotes(Facility facility){
-        //TODO get the number of votes for the facility
-        return 0;
+        List<FacilityVote> facilityVotes = facilityVoteRepository.findAll();
+
+        facilityVotes = filterByFacility(facilityVotes, facility.getId());
+
+        return facilityVotes.size();
+    }
+
+    public List<FacilityVote> filterByPhoneNumber(List<FacilityVote> facilityVotes, String phoneNumber) {
+        ArrayList<FacilityVote> filtered = new ArrayList<>();
+
+        for (FacilityVote facilityVote :
+                facilityVotes) {
+            if (facilityVote.getPhoneNumber().equals(phoneNumber)) {
+                filtered.add(facilityVote);
+            }
+        }
+        return filtered;
+    }
+
+    public List<FacilityVote> filterByFacility(List<FacilityVote> facilityVotes, String facilityId) {
+        ArrayList<FacilityVote> filtered = new ArrayList<>();
+
+        for (FacilityVote facilityVote :
+                facilityVotes) {
+            if (facilityVote.getFacilityId().equals(facilityId)) {
+                filtered.add(facilityVote);
+            }
+        }
+        return filtered;
     }
 }
