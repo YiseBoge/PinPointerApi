@@ -43,7 +43,7 @@ public class UserService {
 
         for (FacilityVote facilityVote :
                 facilityVotes) {
-            if (facilityVote.getPhoneNumber().equals(phoneNumber)) {
+            if (facilityVote.getPhoneNumber().equalsIgnoreCase(phoneNumber)) {
                 filtered.add(facilityVote);
             }
         }
@@ -55,7 +55,7 @@ public class UserService {
 
         for (FacilityVote facilityVote :
                 facilityVotes) {
-            if (facilityVote.getFacilityId().equals(facilityId)) {
+            if (facilityVote.getFacilityId().equalsIgnoreCase(facilityId)) {
                 filtered.add(facilityVote);
             }
         }

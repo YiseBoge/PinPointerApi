@@ -34,7 +34,14 @@ public class FacilityController {
 
     // Get Mappings //
     @GetMapping
-    public ResponseEntity<List<JsonFacility>> fetch(@RequestParam(name = "name", defaultValue = "null") String name, @RequestParam(name = "description", defaultValue = "null") String description, @RequestParam(name = "type", defaultValue = "null") String type, @RequestParam(name = "latitude", defaultValue = "0") double latitude, @RequestParam(name = "longitude", defaultValue = "0") double longitude, @RequestParam(name = "max_distance", defaultValue = "0") int maxDistance, @RequestParam(name = "min_views", defaultValue = "0") int minViews){
+    public ResponseEntity<List<JsonFacility>> fetch(@RequestParam(name = "keyword", defaultValue = "null") String keyword, @RequestParam(name = "name", defaultValue = "null") String name, @RequestParam(name = "description", defaultValue = "null") String description, @RequestParam(name = "type", defaultValue = "null") String type, @RequestParam(name = "latitude", defaultValue = "0") double latitude, @RequestParam(name = "longitude", defaultValue = "0") double longitude, @RequestParam(name = "max_distance", defaultValue = "0") int maxDistance, @RequestParam(name = "min_views", defaultValue = "0") int minViews, @RequestParam(name = "min_votes", defaultValue = "0") int minVotes, @RequestParam(name = "max_votes", defaultValue = "0") int maxVotes){
+        ArrayList<JsonFacility> facilities = facilityService.findAll();
+        if (!keyword.equals("null")){
+            facilities = facilityService.filter(facilities, keyword);
+
+            return new ResponseEntity<>(facilities, HttpStatus.OK);
+        }
+
         name = name.equals("null") ? null: name;
         description = description.equals("null") ? null: description;
         type = type.equals("null") ? null: type;
@@ -47,8 +54,8 @@ public class FacilityController {
         filterParameters.setLongitude(longitude);
         filterParameters.setMaxDistance(maxDistance);
         filterParameters.setMinViews(minViews);
-
-        ArrayList<JsonFacility> facilities = facilityService.findAll();
+        filterParameters.setMinVotes(minVotes);
+        filterParameters.setMaxVotes(maxVotes);
 
         facilities = facilityService.filter(facilities, filterParameters);
 
@@ -125,9 +132,4 @@ public class FacilityController {
 
         return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
     }
-
-
-    // Customized Queries from this point on //
-
-
 }

@@ -133,9 +133,9 @@ public class FacilityService {
 
         for (JsonFacility facility :
                 allFacilities) {
-            if (parameters.getName() == null || facility.getName().contains(parameters.getName())) {
-                if (parameters.getDescription() == null || facility.getDescription().contains(parameters.getDescription())) {
-                    if (parameters.getType() == null || facility.getType().contains(parameters.getType())) {
+            if (parameters.getName() == null || containsIgnoreCase(facility.getName(), parameters.getName())) {
+                if (parameters.getDescription() == null || containsIgnoreCase(facility.getDescription(), parameters.getDescription())) {
+                    if (parameters.getType() == null || containsIgnoreCase(facility.getType(), parameters.getType())) {
                         if (parameters.getMinViews() == 0 || (facility.getViews() >= parameters.getMinViews())) {
                             if (parameters.getMinVotes() == 0 || (facility.getVotes() >= parameters.getMinVotes())) {
                                 if (parameters.getMaxVotes() == 0 || (facility.getVotes() < parameters.getMaxVotes())) {
@@ -164,8 +164,8 @@ public class FacilityService {
                 allFacilities) {
 
             if (facility.getName().contains(parameter)
-                    || facility.getDescription().contains(parameter)
-                    || facility.getType().contains(parameter)){
+                    || containsIgnoreCase(facility.getDescription(), parameter)
+                    || containsIgnoreCase(facility.getType(), parameter)){
                 filtered.add(facility);
             }
         }
@@ -191,5 +191,9 @@ public class FacilityService {
 
 
         return facilities;
+    }
+
+    public static boolean containsIgnoreCase(String str, String subString) {
+        return str.toLowerCase().contains(subString.toLowerCase());
     }
 }
