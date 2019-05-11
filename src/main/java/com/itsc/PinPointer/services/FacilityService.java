@@ -2,7 +2,7 @@ package com.itsc.PinPointer.services;
 
 import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.json.JsonFacility;
-import com.itsc.PinPointer.domains.json.QuerryObject;
+import com.itsc.PinPointer.domains.json.QueryObject;
 import com.itsc.PinPointer.exceptions.DataNotFoundException;
 import com.itsc.PinPointer.repositories.FacilityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class FacilityService {
         return facilityRepository.update(facility);
     }
 
-    public List<JsonFacility> findAll() {
+    public ArrayList<JsonFacility> findAll() {
         List<Facility> facilities = facilityRepository.findAll();
         ArrayList<JsonFacility> jsonFacilities = new ArrayList<>();
 
@@ -51,15 +51,31 @@ public class FacilityService {
                     toJsonFacility(facility)
             );
         }
-
-//        jsonFacilities = sort(jsonFacilities, "name");
-        QuerryObject querryObject = new QuerryObject();
-
-        jsonFacilities = filter(jsonFacilities, querryObject);
-
-        jsonFacilities = sort(jsonFacilities, "name");
+        jsonFacilities = sort(jsonFacilities, "views");
 
         return jsonFacilities;
+    }
+
+    public ArrayList<JsonFacility> findVoted() {
+        ArrayList<JsonFacility> facilities = findAll();
+
+        QueryObject queryObject = new QueryObject();
+        queryObject.setMinVotes(5);
+
+        facilities = filter(facilities, queryObject);
+
+        return facilities;
+    }
+
+    public ArrayList<JsonFacility> findUnvoted() {
+        ArrayList<JsonFacility> facilities = findAll();
+
+        QueryObject queryObject = new QueryObject();
+        queryObject.setMaxVotes(5);
+
+        facilities = filter(facilities, queryObject);
+
+        return facilities;
     }
 
     public Facility findById(String facilityId) throws DataNotFoundException {
@@ -112,7 +128,7 @@ public class FacilityService {
         facilityRepository.remove(facilityId);
     }
 
-    public ArrayList<JsonFacility> filter(ArrayList<JsonFacility> allFacilities, QuerryObject parameters) {
+    public ArrayList<JsonFacility> filter(ArrayList<JsonFacility> allFacilities, QueryObject parameters) {
         ArrayList<JsonFacility> filtered = new ArrayList<>();
 
         for (JsonFacility facility :
@@ -122,12 +138,14 @@ public class FacilityService {
                     if (parameters.getType() == null || facility.getType().contains(parameters.getType())) {
                         if (parameters.getMinViews() == 0 || (facility.getViews() >= parameters.getMinViews())) {
                             if (parameters.getMinVotes() == 0 || (facility.getVotes() >= parameters.getMinVotes())) {
-                                if (parameters.getMaxDistance() == 0 ||
-                                        (distance(facility.getLatitude(), facility.getLongitude(),
-                                                parameters.getLatitude(), parameters.getLongitude())
-                                                <= parameters.getMaxDistance())) {
+                                if (parameters.getMaxVotes() == 0 || (facility.getVotes() < parameters.getMaxVotes())) {
+                                    if (parameters.getMaxDistance() == 0 ||
+                                            (distance(facility.getLatitude(), facility.getLongitude(),
+                                                    parameters.getLatitude(), parameters.getLongitude())
+                                                    <= parameters.getMaxDistance())) {
 
-                                    filtered.add(facility);
+                                        filtered.add(facility);
+                                    }
                                 }
                             }
                         }
@@ -164,10 +182,10 @@ public class FacilityService {
                 Collections.sort(facilities, compareByType);
                 break;
             case "views":
-                Collections.sort(facilities, compareByViews);
+                Collections.sort(facilities, compareByViews.reversed());
                 break;
             case "votes":
-                Collections.sort(facilities, compareByVotes);
+                Collections.sort(facilities, compareByVotes.reversed());
                 break;
         }
 

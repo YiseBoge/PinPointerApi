@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuerryObject {
+public class QueryObject {
 
     private String name;
 
@@ -20,5 +20,6 @@ public class QuerryObject {
 
     private int minViews;
     private int minVotes;
+    private int maxVotes;
     private int maxDistance;
 }

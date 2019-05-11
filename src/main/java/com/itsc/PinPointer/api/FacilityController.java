@@ -3,6 +3,7 @@ package com.itsc.PinPointer.api;
 import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.FacilityVote;
 import com.itsc.PinPointer.domains.json.JsonFacility;
+import com.itsc.PinPointer.domains.json.QueryObject;
 import com.itsc.PinPointer.exceptions.DataNotFoundException;
 import com.itsc.PinPointer.services.FacilityService;
 import com.itsc.PinPointer.services.UserService;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +34,23 @@ public class FacilityController {
 
     // Get Mappings //
     @GetMapping
-    public ResponseEntity<List<JsonFacility>> findAll(){
-        List<JsonFacility> facilities = facilityService.findAll();
+    public ResponseEntity<List<JsonFacility>> fetch(@RequestParam(name = "name", defaultValue = "null") String name, @RequestParam(name = "description", defaultValue = "null") String description, @RequestParam(name = "type", defaultValue = "null") String type, @RequestParam(name = "latitude", defaultValue = "0") double latitude, @RequestParam(name = "longitude", defaultValue = "0") double longitude, @RequestParam(name = "max_distance", defaultValue = "0") int maxDistance, @RequestParam(name = "min_views", defaultValue = "0") int minViews){
+        name = name.equals("null") ? null: name;
+        description = description.equals("null") ? null: description;
+        type = type.equals("null") ? null: type;
+
+        QueryObject filterParameters = new QueryObject();
+        filterParameters.setName(name);
+        filterParameters.setDescription(description);
+        filterParameters.setType(type);
+        filterParameters.setLatitude(latitude);
+        filterParameters.setLongitude(longitude);
+        filterParameters.setMaxDistance(maxDistance);
+        filterParameters.setMinViews(minViews);
+
+        ArrayList<JsonFacility> facilities = facilityService.findAll();
+
+        facilities = facilityService.filter(facilities, filterParameters);
 
         return new ResponseEntity<>(facilities, HttpStatus.OK);
     }
@@ -111,4 +128,6 @@ public class FacilityController {
 
 
     // Customized Queries from this point on //
+
+
 }

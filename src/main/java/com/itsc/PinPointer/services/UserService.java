@@ -1,6 +1,5 @@
 package com.itsc.PinPointer.services;
 
-import com.github.fabiomaffioletti.firebase.repository.Filter;
 import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.FacilityVote;
 import com.itsc.PinPointer.repositories.FacilityVoteRepository;
