@@ -4,6 +4,7 @@ import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.FacilityVote;
 import com.itsc.PinPointer.domains.json.JsonFacility;
 import com.itsc.PinPointer.domains.json.QueryObject;
+import com.itsc.PinPointer.domains.json.ReportHolder;
 import com.itsc.PinPointer.exceptions.DataNotFoundException;
 import com.itsc.PinPointer.services.FacilityService;
 import com.itsc.PinPointer.services.UserService;
@@ -23,6 +24,8 @@ import java.util.Map;
 @CrossOrigin(origins = "*")
 public class FacilityController {
 
+    ArrayList<String> allTypes = new ArrayList<>();
+
     private FacilityService facilityService;
     private UserService userService;
 
@@ -30,6 +33,14 @@ public class FacilityController {
     public FacilityController(FacilityService facilityService, UserService userService) {
         this.facilityService = facilityService;
         this.userService = userService;
+
+        allTypes.add("ATM");
+        allTypes.add("Bank");
+        allTypes.add("Hospital");
+        allTypes.add("Gas Station");
+        allTypes.add("Restaurant");
+        allTypes.add("Library");
+        allTypes.add("Tinies");
     }
 
     // Get Mappings //
@@ -131,5 +142,31 @@ public class FacilityController {
         result.put("message", HttpStatus.NO_CONTENT);
 
         return new ResponseEntity<>(result, HttpStatus.NO_CONTENT);
+    }
+
+    // Custom Queries //
+
+    @GetMapping("/category-counts")
+    public ResponseEntity<List<ReportHolder>> countByCategory(){
+        List<ReportHolder> reports = new ArrayList<>();
+        ArrayList<JsonFacility> allFacilities = facilityService.findAll();
+        QueryObject queryObject = new QueryObject();
+
+        for (String type:
+             allTypes) {
+            queryObject.setType(type);
+            ArrayList<JsonFacility> facilities = facilityService.filter(allFacilities, queryObject);
+
+            ReportHolder reportHolder = new ReportHolder();
+            reportHolder.setType(type);
+            reportHolder.setViews(
+                    facilities.stream().mapToInt(JsonFacility::getViews).sum()
+            );
+            reportHolder.setFacilitiesAmount(facilities.size());
+
+            reports.add(reportHolder);
+        }
+
+        return new ResponseEntity<>(reports, HttpStatus.OK);
     }
 }
