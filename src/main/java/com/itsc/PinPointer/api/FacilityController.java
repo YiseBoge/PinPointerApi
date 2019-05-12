@@ -35,12 +35,11 @@ public class FacilityController {
         this.userService = userService;
 
         allTypes.add("ATM");
-        allTypes.add("Bank");
         allTypes.add("Hospital");
-        allTypes.add("Gas Station");
+        allTypes.add("Hotel");
         allTypes.add("Restaurant");
-        allTypes.add("Library");
-        allTypes.add("Tinies");
+        allTypes.add("Gas Station");
+        allTypes.add("School");
     }
 
     // Get Mappings //
@@ -125,8 +124,6 @@ public class FacilityController {
 
         found.setName(jsonFacility.getName());
         found.setDescription(jsonFacility.getDescription());
-        found.setLatitude(jsonFacility.getLatitude());
-        found.setLongitude(jsonFacility.getLongitude());
 
         return new ResponseEntity<>(facilityService.update(found), HttpStatus.OK);
     }
