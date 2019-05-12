@@ -146,7 +146,7 @@ public class FacilityController {
 
     // Custom Queries //
 
-    @GetMapping("/category-counts")
+    @GetMapping("/report")
     public ResponseEntity<List<ReportHolder>> countByCategory(){
         List<ReportHolder> reports = new ArrayList<>();
         ArrayList<JsonFacility> allFacilities = facilityService.findAll();
