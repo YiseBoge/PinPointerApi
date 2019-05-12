@@ -2,6 +2,7 @@ package com.itsc.PinPointer.api;
 
 import com.itsc.PinPointer.domains.Facility;
 import com.itsc.PinPointer.domains.FacilityVote;
+import com.itsc.PinPointer.domains.json.JsonEditFacility;
 import com.itsc.PinPointer.domains.json.JsonFacility;
 import com.itsc.PinPointer.domains.json.QueryObject;
 import com.itsc.PinPointer.domains.json.ReportHolder;
@@ -118,7 +119,7 @@ public class FacilityController {
 
     // Put Mappings //
     @PutMapping("/{id}/edit")
-    public ResponseEntity<Facility> edit(@Valid @RequestBody JsonFacility jsonFacility, @PathVariable("id") String facilityId) throws DataNotFoundException {
+    public ResponseEntity<Facility> edit(@Valid @RequestBody JsonEditFacility jsonFacility, @PathVariable("id") String facilityId) throws DataNotFoundException {
 
         Facility found = facilityService.findById(facilityId);
 
